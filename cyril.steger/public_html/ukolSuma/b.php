@@ -14,6 +14,7 @@ if (isset($post["cisla"]) && sizeof($post["cisla"]) > 0) {
         }
     }
 }
+/* frontend */
 $result["validni"] = $validni;
 $result["invalidni"] = $invalidni;
 $result["suma"] = $suma;

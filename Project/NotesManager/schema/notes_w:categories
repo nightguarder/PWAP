@@ -1,0 +1,39 @@
+-- Notes table to store Markdown content
+CREATE TABLE IF NOT EXISTS `Notes` (
+  `note_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `content` LONGTEXT,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `is_encrypted` BOOLEAN DEFAULT FALSE,
+  `category_id` INT,
+  FOREIGN KEY (`user_id`) REFERENCES `Accounts`(`id`),
+  FOREIGN KEY (`category_id`) REFERENCES `Categories`(`category_id`)
+);
+
+-- Categories for organizing notes
+CREATE TABLE IF NOT EXISTS `Categories` (
+  `category_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  `color` VARCHAR(20) DEFAULT '#0D6EFD',
+  FOREIGN KEY (`user_id`) REFERENCES `Accounts`(`id`)
+);
+
+-- Tags for additional organization
+CREATE TABLE IF NOT EXISTS `Tags` (
+  `tag_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(50) NOT NULL,
+  `user_id` INT NOT NULL,
+  FOREIGN KEY (`user_id`) REFERENCES `Accounts`(`id`)
+);
+
+-- Junction table for many-to-many relationship between notes and tags
+CREATE TABLE IF NOT EXISTS `NoteTags` (
+  `note_id` INT,
+  `tag_id` INT,
+  PRIMARY KEY (`note_id`, `tag_id`),
+  FOREIGN KEY (`note_id`) REFERENCES `Notes`(`note_id`),
+  FOREIGN KEY (`tag_id`) REFERENCES `Tags`(`tag_id`)
+);

@@ -20,3 +20,8 @@
 */.bashrc
 
 # End of https://www.toptal.com/developers/gitignore/api/phpunit
+Project/NotesManager/config/config.conf
+Project/NotesManager/lib/notes.php
+Project/.DS_Store
+.DS_Store
+Project/NotesManager/schema/notes_future_update.sql

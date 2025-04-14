@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Manage your notes efficiently.">
+    <!-- CSS styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/style.css">
+    
+    
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <title>Notes Manager</title>
+</head>
+
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-sticky-note fa-lg" class="d-inline-block align-top" alt="logo"></i> 
+                Notes Manager
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/index.html">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/lib/login.php">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="/lib/notes.php">Notes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="/lib/vault.php">Vault</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="py-5 mt-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="row gx-4 gx-lg-5 align-items-center">
+                <div class="col-md-6">
+                    <h1 class="display-4 fw-bold text-white">Welcome to Notes Manager!</h1>
+                    <p class="lead text-light">Your secure solution for organizing school notes and study materials.</p>
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-start">
+                        <a href="/lib/login.php" class="btn btn-primary btn-lg px-4 me-sm-3">Get Started</a>
+                        <a href="#features" class="btn btn-outline-light btn-lg px-4">Learn More</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-center">
+                    <i class="fas fa-book-open fa-8x text-primary mb-4"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5 bg-dark" id="features">
+        <div class="container px-4 px-lg-5">
+            <h2 class="text-center text-white mb-5">Why Use Notes Manager?</h2>
+            <div class="row gx-4 gx-lg-5">
+                <div class="col-lg-4 mb-5">
+                    <div class="card h-100 bg-dark text-white border-primary">
+                        <div class="card-body text-center p-4 p-lg-5">
+                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <h2 class="fs-4 fw-bold">Secure Storage</h2>
+                            <p class="mb-0">Keep your academic notes protected with our secure encryption system.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-5">
+                    <div class="card h-100 bg-dark text-white border-primary">
+                        <div class="card-body text-center p-4 p-lg-5">
+                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4">
+                                <i class="fas fa-sync"></i>
+                            </div>
+                            <h2 class="fs-4 fw-bold">Sync Everywhere</h2>
+                            <p class="mb-0">Access your notes from any device, anytime, anywhere.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-5">
+                    <div class="card h-100 bg-dark text-white border-primary">
+                        <div class="card-body text-center p-4 p-lg-5">
+                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <h2 class="fs-4 fw-bold">Organize Easily</h2>
+                            <p class="mb-0">Categorize and search through your notes with powerful organization tools.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login/Register Call to Action -->
+    <section class="py-5 bg-gradient">
+        <div class="container pt-3">
+            <div class="row justify-content-center">
+                <div class="col-md-5 shadow-lg p-5 bg-dark text-light rounded">
+                    <div class="row justify-content-center text-center">
+                        <h3 class="mb-3">Ready to Start?</h3>
+                        <div class="icon d-flex align-items-center justify-content-center">
+                            <span class="avatar"><i class="fa-solid fa-user fa-3x text-primary"></i></span>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-12 text-center mt-4">
+                            <a href="/lib/login.php" class="btn btn-primary btn-lg mb-3">Login</a>
+                            <p class="text-center mt-2">Don't have an account?
+                                <a href="/lib/register.html">Register</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark py-4 mt-auto">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center">
+                    <h2 class="heading-section text-white">Notes Manager
+                        <br>
+                        <small class="text-muted">© 2025 All rights reserved.</small>
+                    </h2>
+                    <hr class="bg-light">
+                    <div class="row justify-content-center">
+                        <div class="col-md-4">
+                            <ul class="list-unstyled d-flex justify-content-center">
+                                <li class="mx-2"><a href="https://github.com/nightguarder" class="text-light"><i class="fa-brands fa-github fa-xl"></i></a></li>
+                                <li class="mx-2"><a href="mailto:steger1.cyril@gmail.com" class="text-light"><i class="fa-solid fa-envelope fa-xl"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <small class="text-muted">Created by <i>Nigthguarder</i></small>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Script files -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/fb46939310.js" crossorigin="anonymous"></script>
+</body>
+</html>
+

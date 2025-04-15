@@ -14,9 +14,10 @@ $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 $notes = [];
 $message = ''; // For status messages
 
-//Timeout check
+// Properly use the sessionTimeout function
 sessionTimeout(600); // 10 minutes
-$conn = getDBConnection();
+
+$conn = getDbConnection(); // Fixed function name (was getDBConnection)
 if (!$conn) {
     die('Failed to connect to MySQL: ' . mysqli_connect_error());
 }

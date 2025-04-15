@@ -17,12 +17,14 @@ $message = ''; // For status messages
 $status = 'active'; // Default status for notes
 
 
-$conn = getDBConnection();
+$conn = getDbConnection(); // Fixed function name (was getDBConnection)
 if (!$conn) {
     die('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
-//Timeout check
-sessionTimeout(1200); // 20 minutes
+
+// Properly use the sessionTimeout function
+sessionTimeout(1200); //< 20 minutes
+
 // Check if the notes table has the status column
 $tableCheck = $conn->query("SHOW COLUMNS FROM Notes LIKE 'status'");
 if ($tableCheck->num_rows === 0) {

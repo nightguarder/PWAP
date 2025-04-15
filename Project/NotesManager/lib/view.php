@@ -1,6 +1,8 @@
 <?php
 // Include authentication check
 require_once('../config/authCheck.php');
+// Include db connection
+require_once('../config/db.php');
 
 // Get user information from the session
 $userName = $_SESSION['name'];
@@ -15,12 +17,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $noteId = intval($_GET['id']);
 
 // Database connection
-$DATABASE_HOST = 'sql107.epizy.com';
-$DATABASE_USER = 'epiz_31121495';
-$DATABASE_PASS = 'zV5I0lWGioAExLi';
-$DATABASE_NAME = 'epiz_31121495_PwdManager';
-
-$conn = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
+$conn = getDbConnection();
 if (!$conn) {
     die('Failed to connect to MySQL: ' . mysqli_connect_error());
 }

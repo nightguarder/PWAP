@@ -1,32 +1,28 @@
 <?php
 /* Authenticate / Login */
+require_once('db.php'); //DB connection file
+
 function getConfigValue($key)
 {
     if (get_cfg_var('/config/config.conf'))
         return get_cfg_var($key);
-	
+    
     return ini_get($key);
 }
+
 function redirect() {
-	header("refresh:3; url=logout.php");
+    header("refresh:3; url=logout.php");
     print '<p>Redirecting you to the Login page... If not, click <a href="../index.html">here</a>.</p>';
 }
+
 session_start();
-// Setup database connection
-$DATABASE_HOST = 'sql107.epizy.com';
-$DATABASE_USER = 'epiz_31121495';
-$DATABASE_PASS = 'zV5I0lWGioAExLi';
-$DATABASE_NAME = 'epiz_31121495_PwdManager';
 
+//Connect to database
+$conn = getDbConnection();
 
-$conn = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 //save post form values to variables
 $username = $_POST['username'];
 $pwd = $_POST['password'];
-
-// If there is an error with the connection
-if (mysqli_connect_errno()) 
-	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 
 // isset() will check if the data exists.
 if (!isset($_POST['username'], $_POST['password']))
@@ -72,5 +68,6 @@ if($stmt = $conn->prepare('SELECT id, password FROM Accounts WHERE username = ?'
     }
 	$stmt->close();
 }
+
 $conn->close();
 ?>

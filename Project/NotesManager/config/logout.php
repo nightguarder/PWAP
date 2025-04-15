@@ -2,6 +2,6 @@
 session_start();
 session_destroy();
 // Redirect to the login page:
-header('Location: ../login.php', TRUE, 302);
+header('Location: ../lib/login.php', TRUE, 302);
 exit();
 ?>

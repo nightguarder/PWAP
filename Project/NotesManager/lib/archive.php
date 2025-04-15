@@ -5,7 +5,6 @@ require_once('../config/authCheck.php');
 require_once('../config/db.php');
 // Include timeout check
 require_once('../config/timeout.php');
-
 // Get user information from the session
 $userName = $_SESSION['name'];
 $userId = $_SESSION['id'];
@@ -14,15 +13,14 @@ $userId = $_SESSION['id'];
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 $notes = [];
 $message = ''; // For status messages
-$status = 'active'; // Default status for notes
 
-
+//Timeout check
+sessionTimeout(600); // 10 minutes
 $conn = getDBConnection();
 if (!$conn) {
     die('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
-//Timeout check
-sessionTimeout(1200); // 20 minutes
+
 // Check if the notes table has the status column
 $tableCheck = $conn->query("SHOW COLUMNS FROM Notes LIKE 'status'");
 if ($tableCheck->num_rows === 0) {
@@ -30,47 +28,37 @@ if ($tableCheck->num_rows === 0) {
     $conn->query("ALTER TABLE Notes ADD COLUMN status VARCHAR(20) DEFAULT 'active'");
 }
 
-// Handle note archiving (soft delete)
-if (isset($_POST['archive_note']) && isset($_POST['note_id'])) {
-    $noteId = intval($_POST['note_id']);
-    $stmt = $conn->prepare('UPDATE Notes SET status = ? WHERE note_id = ? AND user_id = ?');
-    $status = 'archived';
-    $stmt->bind_param('sii', $status, $noteId, $userId);
-    
-    if ($stmt->execute()) {
-        $message = "Note archived successfully.";
-    } else {
-        $message = "Error archiving note.";
-    }
-}
-
-// Handle note restoration
+//Handle restore of note
 if (isset($_POST['restore_note']) && isset($_POST['note_id'])) {
     $noteId = intval($_POST['note_id']);
-    $stmt = $conn->prepare('UPDATE Notes SET status = ? WHERE note_id = ? AND user_id = ?');
-    $status = 'active';
-    // Check if the note is already active
-    $stmt->bind_param('sii', $status, $noteId, $userId);
+    $stmt = $conn->prepare('UPDATE Notes SET status = "active" WHERE note_id = ? AND user_id = ?');
+    $stmt->bind_param('ii', $noteId, $userId);
     
     if ($stmt->execute()) {
         $message = "Note restored successfully.";
     } else {
         $message = "Error restoring note.";
     }
+    $stmt->close();
 }
 
-// Build query for notes based on search filter and status active
-$query = 'SELECT note_id, title, content, created_at, updated_at, status FROM Notes WHERE user_id = ? AND status = "active"';
 
-// Check for if there are any records with NULL status
-$checkNullQuery = $conn->query('SELECT COUNT(*) AS count FROM Notes WHERE status IS NULL');
-$nullCount = $checkNullQuery->fetch_assoc()['count'];
-
-if ($nullCount > 0) {
-    // If there are records with NULL status, include them in the query
-    $query = 'SELECT note_id, title, content, created_at, updated_at, status FROM Notes WHERE user_id = ? AND (status = "active" OR status IS NULL)';
+// Handle delete of note
+if (isset($_POST['permanent_delete']) && isset($_POST['note_id'])) {
+    $noteId = intval($_POST['note_id']);
+    $stmt = $conn->prepare('DELETE FROM Notes WHERE note_id = ? AND user_id = ?');
+    $stmt->bind_param('ii', $noteId, $userId);
+    
+    if ($stmt->execute()) {
+        $message = "Note permanently deleted.";
+    } else {
+        $message = "Error deleting note.";
+    }
+    $stmt->close();
 }
 
+// Build query for archived notes
+$query = 'SELECT note_id, title, content, created_at, updated_at FROM Notes WHERE user_id = ? AND status = "archived"';
 $params = [$userId];
 $types = 'i';
 
@@ -84,7 +72,6 @@ if (!empty($searchQuery)) {
 
 $query .= ' ORDER BY updated_at DESC';
 
-// Execute the query with parameters
 $stmt = $conn->prepare($query);
 if (!empty($params)) {
     $stmt->bind_param($types, ...$params);
@@ -93,12 +80,9 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 while ($row = $result->fetch_assoc()) {
-    // Check if the note is already active
-    if ($row['status'] === 'active') {
-        // Prepare a snippet of the content (first 150 characters)
-        $row['snippet'] = substr(strip_tags($row['content']), 0, 150) . (strlen($row['content']) > 150 ? '...' : '');
-        $notes[] = $row;
-    }
+    // Prepare a snippet of the content (first 150 characters)
+    $row['snippet'] = substr(strip_tags($row['content']), 0, 150) . (strlen($row['content']) > 150 ? '...' : '');
+    $notes[] = $row;
 }
 
 $conn->close();
@@ -119,7 +103,7 @@ function formatDate($dateString) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://kit.fontawesome.com/fb46939310.js" crossorigin="anonymous"></script>
-    <title>My Notes - Notes Manager</title>
+    <title>Archived Notes - Notes Manager</title>
     <style>
         .card-note:hover {
             transform: translateY(-5px);
@@ -149,11 +133,11 @@ function formatDate($dateString) {
                         <li class="nav-item">
                             <a class="nav-link" href="/lib/notes.php">Notes</a>
                         </li>
-                        <li class="nav-item active">
-                            <a class="nav-link" href="/lib/vault.php">Vault <span class="sr-only">(current)</span></a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/lib/vault.php">Vault</a>
                         </li>
                         <li class="nav-item"> 
-                            <a href="/lib/archive.php" class="nav-link">Archive</a>
+                            <a href="/lib/archive.php" class="nav-link"><span class="sr-only">(current)</span>Archive</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto">
@@ -183,29 +167,26 @@ function formatDate($dateString) {
     
         <div class="row mb-4">
             <div class="col-md-6">
-                <h1 class="text-white">Your Notes</h1>
-                <p class="text-light">Welcome to your secure notes vault, <?php echo htmlspecialchars($userName); ?>.</p>
+                <h1 class="text-white">Archived Notes</h1>
+                <p class="text-light">These are notes you have archived.</p>
             </div>
             <div class="col-md-6 text-end">
-                <a href="notes.php" class="btn btn-primary me-2">
-                    <i class="fas fa-plus"></i> Create New Note
-                </a>
-                <a href="archive.php" class="btn btn-secondary">
-                    <i class="fas fa-archive"></i> View Archived Notes
+                <a href="vault.php" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Active Notes
                 </a>
             </div>
         </div>
         
         <div class="row mb-4">
             <div class="col-md-12">
-                <div class="card bg-dark text-white border-primary">
+                <div class="card bg-dark text-white border-warning">
                     <div class="card-body">
-                        <form method="get" action="vault.php" class="row g-3">
+                        <form method="get" action="archive.php" class="row g-3">
                             <div class="col-md-10">
-                                <input type="text" class="form-control bg-dark text-white" id="search" name="search" placeholder="Search notes..." value="<?php echo htmlspecialchars($searchQuery); ?>">
+                                <input type="text" class="form-control bg-dark text-white" id="search" name="search" placeholder="Search archived notes..." value="<?php echo htmlspecialchars($searchQuery); ?>">
                             </div>
                             <div class="col-md-2">
-                                <button type="submit" class="btn btn-primary w-100">Search</button>
+                                <button type="submit" class="btn btn-warning w-100">Search</button>
                             </div>
                         </form>
                     </div>
@@ -218,39 +199,42 @@ function formatDate($dateString) {
                 <div class="col-12">
                     <div class="card bg-dark text-white border-secondary">
                         <div class="card-body text-center py-5">
-                            <i class="fas fa-folder-open fa-4x mb-3 text-secondary"></i>
-                            <h3>No Notes Found</h3>
-                            <p class="text-muted mb-0">
-                                Create your first note to get started!
-                            </p>
-                            <a href="notes.php" class="btn btn-primary mt-3">Create Note</a>
+                            <i class="fas fa-archive fa-4x mb-3 text-secondary"></i>
+                            <h3>No Archived Notes Found</h3>
+                            <p class="text-muted mb-0">Your archive is empty.</p>
+                            <a href="vault.php" class="btn btn-secondary mt-3">Back to Active Notes</a>
                         </div>
                     </div>
                 </div>
             <?php else: ?>
                 <?php foreach ($notes as $note): ?>
                     <div class="col">
-                        <div class="card h-100 bg-dark text-white border-primary card-note">
+                        <div class="card h-100 bg-dark text-white border-warning card-note">
+                            <div class="card-header bg-warning bg-gradient text-dark">
+                                <h5 class="card-title mb-0"><?php echo htmlspecialchars($note['title']); ?></h5>
+                            </div>
                             <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($note['title']); ?></h5>
                                 <p class="card-text text-muted small">
                                     Updated: <?php echo formatDate($note['updated_at']); ?>
                                 </p>
                                 <p class="card-text"><?php echo htmlspecialchars($note['snippet']); ?></p>
                             </div>
-                            <div class="card-footer bg-transparent border-top border-primary d-flex justify-content-between">
-                                <a href="view.php?id=<?php echo $note['note_id']; ?>" class="btn btn-sm btn-outline-primary">
+                            <div class="card-footer bg-transparent border-top border-warning d-flex justify-content-between">
+                                <a href="view.php?id=<?php echo $note['note_id']; ?>" class="btn btn-sm btn-outline-light">
                                     <i class="fas fa-eye"></i> View
                                 </a>
                                 <div>
-                                    <a href="notes.php?id=<?php echo $note['note_id']; ?>" class="btn btn-sm btn-outline-info">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </a>
-                                    <form method="post" action="vault.php" class="d-inline">
+                                    <form method="post" action="archive.php" class="d-inline">
                                         <input type="hidden" name="note_id" value="<?php echo $note['note_id']; ?>">
-                                        <button type="submit" name="archive_note" class="btn btn-sm btn-outline-warning" title="Archive Note"
-                                            onclick="return confirm('Are you sure you want to archive this note?');">
-                                            <i class="fas fa-archive"></i>
+                                        <button type="submit" name="restore_note" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-undo"></i> Restore
+                                        </button>
+                                    </form>
+                                    <form method="post" action="archive.php" class="d-inline ms-1">
+                                        <input type="hidden" name="note_id" value="<?php echo $note['note_id']; ?>">
+                                        <button type="submit" name="permanent_delete" class="btn btn-sm btn-outline-danger" 
+                                            onclick="return confirm('Are you sure you want to PERMANENTLY delete this note? This action cannot be undone.');">
+                                            <i class="fas fa-trash"></i> 
                                         </button>
                                     </form>
                                 </div>
